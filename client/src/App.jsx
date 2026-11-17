@@ -18,6 +18,7 @@ export default function App() {
   // vista: 'tienda' | 'carrito' | 'entrega' | 'listo'
   const [vista, setVista] = useState('tienda');
   const [pedido, setPedido] = useState(null);
+  const [cicloData, setCicloData] = useState(null);
   const { items, total, totalProductos, vaciar } = useCarrito();
 
   // Cambia de pantalla y sube al inicio (o baja a una sección de la tienda)
@@ -69,12 +70,12 @@ export default function App() {
             </section>
 
             <Catalogo />
-            <Calculadora />
+            <ComoPedir />
+            <Calculadora onCalculo={setCicloData} />
+            <ConoceCiclo cicloData={cicloData} />
             <PreguntaSinVerguenza />
             <AprendeCuerpo />
-            <ConoceCiclo />
             <MetodosAnticonceptivos />
-            <ComoPedir />
 
             <section id="beneficios" className="info-seccion">
               <h2>Por qué elegir opciones sostenibles para tu salud:</h2>
@@ -97,6 +98,14 @@ export default function App() {
           <PedidoListo pedido={pedido} onTienda={() => ir('tienda', '#catalogo')} />
         )}
       </main>
+
+      {/* Carrito flotante: se ve por toda la página mientras haya productos */}
+      {vista === 'tienda' && totalProductos > 0 && (
+        <button className="carrito-flotante" id="carrito-flotante" onClick={() => ir('carrito')} aria-label={`Abrir carrito, ${totalProductos} productos`}>
+          🛒
+          <span className="badge">{totalProductos}</span>
+        </button>
+      )}
 
       <footer>
         <img className="logo-footer" src="/logo_oficial.png" alt="" />
