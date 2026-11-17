@@ -8,8 +8,12 @@ import Producto from './models/Producto.js';
 import Pregunta from './models/Pregunta.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PORT = process.env.PORT || 3000;
-const { MONGODB_URI } = process.env;
+let PORT = process.env.PORT;
+if (!PORT) {
+  PORT = 3000;
+}
+
+const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
   console.error('❌ Falta MONGODB_URI en server/.env (copia .env.example)');
@@ -21,7 +25,7 @@ app.use(cors());
 app.use(express.json());
 
 // ---------- API ----------
-app.get('/api/productos', async (req, res) => {
+app.get('/api/productos', async function (req, res) {
   try {
     const filtro = {};
     if (req.query.categoria && req.query.categoria !== 'todos') {
@@ -34,17 +38,19 @@ app.get('/api/productos', async (req, res) => {
   }
 });
 
-app.get('/api/productos/:id', async (req, res) => {
+app.get('/api/productos/:id', async function (req, res) {
   try {
     const producto = await Producto.findById(req.params.id);
-    if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
+    if (!producto) {
+      return res.status(404).json({ error: 'Producto no encontrado' });
+    }
     res.json(producto);
   } catch (err) {
     res.status(400).json({ error: 'ID inválido' });
   }
 });
 
-app.post('/api/productos', async (req, res) => {
+app.post('/api/productos', async function (req, res) {
   try {
     const producto = await Producto.create(req.body);
     res.status(201).json(producto);
@@ -53,11 +59,12 @@ app.post('/api/productos', async (req, res) => {
   }
 });
 
-// Preguntas anónimas (solo se pueden enviar; no se listan públicamente)
-app.post('/api/preguntas', async (req, res) => {
+// Preguntas anónimas
+app.post('/api/preguntas', async function (req, res) {
   try {
-    const { texto, tema } = req.body;
-    await Pregunta.create({ texto, tema });
+    const texto = req.body.texto;
+    const tema = req.body.tema;
+    await Pregunta.create({ texto: texto, tema: tema });
     res.status(201).json({ ok: true });
   } catch (err) {
     res.status(400).json({ error: 'Escribe una pregunta de al menos 10 caracteres y elige un tema.' });
@@ -67,19 +74,24 @@ app.post('/api/preguntas', async (req, res) => {
 // ---------- Frontend compilado (producción) ----------
 const distPath = path.join(__dirname, '../client/dist');
 app.use(express.static(distPath));
-app.get(/^(?!\/api).*/, (req, res) => {
-  res.sendFile(path.join(distPath, 'index.html'), (err) => {
-    if (err) res.status(404).send('Ejecuta "npm run build" en client/ primero.');
+
+app.get('*', function (req, res) {
+  res.sendFile(path.join(distPath, 'index.html'), function (err) {
+    if (err) {
+      res.status(404).send('Ejecuta "npm run build" en client/ primero.');
+    }
   });
 });
 
 mongoose
-  .connect(MONGODB_URI)
-  .then(() => {
-    console.log('✅ Conectado a MongoDB Atlas');
-    app.listen(PORT, () => console.log(`🌸 API en http://localhost:${PORT}`));
-  })
-  .catch((err) => {
-    console.error('❌ Error conectando a MongoDB:', err.message);
-    process.exit(1);
-  });
+    .connect(MONGODB_URI)
+    .then(function () {
+      console.log('✅ Conectado a MongoDB Atlas');
+      app.listen(PORT, function () {
+        console.log('🌸 API en http://localhost:' + PORT);
+      });
+    })
+    .catch(function (err) {
+      console.error('❌ Error conectando a MongoDB:', err.message);
+      process.exit(1);
+    });

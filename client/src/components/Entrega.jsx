@@ -2,65 +2,192 @@ import { useState } from 'react';
 import { useCarrito } from '../CarritoContext.jsx';
 import { dinero } from '../pedido.js';
 
-const VACIO = { nombre: '', celular: '', ciudad: '', direccion: '', referencia: '', observaciones: '' };
+const VACIO = {
+  nombre: '',
+  celular: '',
+  ciudad: '',
+  direccion: '',
+  referencia: '',
+  observaciones: ''
+};
 
-export default function Entrega({ onVolver, onConfirmar }) {
-  const { items, total } = useCarrito();
+// Función básica para limpiar espacios o guiones y verificar que solo haya números
+function limpiarYValidarCelular(texto) {
+  let soloNumeros = '';
+
+  for (let i = 0; i < texto.length; i++) {
+    const letra = texto[i];
+    if (letra === ' ' || letra === '-') {
+      continue; // Ignora espacios y guiones
+    }
+    if (letra < '0' || letra > '9') {
+      return null; // Si encuentra una letra o símbolo, no es válido
+    }
+    soloNumeros = soloNumeros + letra;
+  }
+
+  if (soloNumeros.length < 7 || soloNumeros.length > 15) {
+    return null;
+  }
+
+  return soloNumeros;
+}
+
+export default function Entrega(props) {
+  const carrito = useCarrito();
   const [datos, setDatos] = useState(VACIO);
   const [errores, setErrores] = useState({});
 
-  const cambiar = (e) => setDatos({ ...datos, [e.target.name]: e.target.value });
+  function cambiar(e) {
+    const copiaDatos = Object.assign({}, datos);
+    copiaDatos[e.target.name] = e.target.value;
+    setDatos(copiaDatos);
+  }
 
-  const validar = () => {
-    const e = {};
-    if (datos.nombre.trim().length < 3) e.nombre = 'Escribe tu nombre completo.';
-    if (!/^\d{7,15}$/.test(datos.celular.replace(/[\s-]/g, ''))) e.celular = 'Escribe un celular válido (solo números).';
-    if (!datos.ciudad.trim()) e.ciudad = 'Indica tu ciudad.';
-    if (datos.direccion.trim().length < 5) e.direccion = 'Escribe tu dirección de entrega.';
-    if (!datos.referencia.trim()) e.referencia = 'Agrega una referencia de ubicación.';
-    return e;
-  };
-
-  const enviar = (ev) => {
+  function enviar(ev) {
     ev.preventDefault();
-    const e = validar();
-    setErrores(e);
-    if (Object.keys(e).length === 0) {
-      onConfirmar({ ...datos, celular: datos.celular.replace(/[\s-]/g, '') });
-    }
-  };
 
-  const campo = (nombre, etiqueta, props = {}) => (
-    <div className="form-grupo">
-      <label htmlFor={`f-${nombre}`}>{etiqueta}</label>
-      <input id={`f-${nombre}`} name={nombre} value={datos[nombre]} onChange={cambiar} {...props} />
-      {errores[nombre] && <small className="error">{errores[nombre]}</small>}
-    </div>
-  );
+    const nuevosErrores = {};
+    let hayErrores = false;
+
+    if (datos.nombre.trim().length < 3) {
+      nuevosErrores.nombre = 'Escribe tu nombre completo.';
+      hayErrores = true;
+    }
+
+    const celularLimpio = limpiarYValidarCelular(datos.celular);
+    if (celularLimpio === null) {
+      nuevosErrores.celular = 'Escribe un celular válido (solo números).';
+      hayErrores = true;
+    }
+
+    if (datos.ciudad.trim() === '') {
+      nuevosErrores.ciudad = 'Indica tu ciudad.';
+      hayErrores = true;
+    }
+
+    if (datos.direccion.trim().length < 5) {
+      nuevosErrores.direccion = 'Escribe tu dirección de entrega.';
+      hayErrores = true;
+    }
+
+    if (datos.referencia.trim() === '') {
+      nuevosErrores.referencia = 'Agrega una referencia de ubicación.';
+      hayErrores = true;
+    }
+
+    setErrores(nuevosErrores);
+
+    if (!hayErrores) {
+      const datosFinales = Object.assign({}, datos);
+      datosFinales.celular = celularLimpio;
+      props.onConfirmar(datosFinales);
+    }
+  }
 
   return (
-    <section className="seccion-bloque pantalla" id="entrega">
-      <h2 className="seccion-titulo">Datos de entrega</h2>
-      <p className="seccion-intro">Completa tus datos para preparar tu pedido de {dinero(total)}.</p>
+      <section className="seccion-bloque pantalla" id="entrega">
+        <h2 className="seccion-titulo">Datos de entrega</h2>
+        <p className="seccion-intro">
+          Completa tus datos para preparar tu pedido de {dinero(carrito.total)}.
+        </p>
 
-      <form className="form-pregunta" onSubmit={enviar} noValidate>
-        {campo('nombre', 'Nombre completo *', { autoComplete: 'name' })}
-        {campo('celular', 'Número de celular *', { type: 'tel', inputMode: 'numeric', autoComplete: 'tel' })}
-        {campo('ciudad', 'Ciudad *')}
-        {campo('direccion', 'Dirección de entrega *', { autoComplete: 'street-address' })}
-        {campo('referencia', 'Referencia de ubicación *', { placeholder: 'Ej: Frente al parque' })}
-        <div className="form-grupo">
-          <label htmlFor="f-observaciones">Observaciones adicionales (opcional)</label>
-          <textarea id="f-observaciones" name="observaciones" rows="3" value={datos.observaciones} onChange={cambiar} />
-        </div>
+        <form className="form-pregunta" onSubmit={enviar} noValidate>
+          <div className="form-grupo">
+            <label htmlFor="f-nombre">Nombre completo *</label>
+            <input
+                id="f-nombre"
+                name="nombre"
+                autoComplete="name"
+                value={datos.nombre}
+                onChange={cambiar}
+            />
+            {errores.nombre && <small className="error">{errores.nombre}</small>}
+          </div>
 
-        {items.length === 0 && <p className="estado estado-error">Tu carrito está vacío.</p>}
+          <div className="form-grupo">
+            <label htmlFor="f-celular">Número de celular *</label>
+            <input
+                id="f-celular"
+                name="celular"
+                type="tel"
+                inputMode="numeric"
+                autoComplete="tel"
+                value={datos.celular}
+                onChange={cambiar}
+            />
+            {errores.celular && <small className="error">{errores.celular}</small>}
+          </div>
 
-        <div className="carrito-botones">
-          <button type="button" className="btn-secundario" id="entrega-volver" onClick={onVolver}>← Volver al carrito</button>
-          <button type="submit" className="btn-calcular" id="entrega-generar" disabled={items.length === 0}>Generar pedido</button>
-        </div>
-      </form>
-    </section>
+          <div className="form-grupo">
+            <label htmlFor="f-ciudad">Ciudad *</label>
+            <input
+                id="f-ciudad"
+                name="ciudad"
+                value={datos.ciudad}
+                onChange={cambiar}
+            />
+            {errores.ciudad && <small className="error">{errores.ciudad}</small>}
+          </div>
+
+          <div className="form-grupo">
+            <label htmlFor="f-direccion">Dirección de entrega *</label>
+            <input
+                id="f-direccion"
+                name="direccion"
+                autoComplete="street-address"
+                value={datos.direccion}
+                onChange={cambiar}
+            />
+            {errores.direccion && <small className="error">{errores.direccion}</small>}
+          </div>
+
+          <div className="form-grupo">
+            <label htmlFor="f-referencia">Referencia de ubicación *</label>
+            <input
+                id="f-referencia"
+                name="referencia"
+                placeholder="Ej: Frente al parque"
+                value={datos.referencia}
+                onChange={cambiar}
+            />
+            {errores.referencia && <small className="error">{errores.referencia}</small>}
+          </div>
+
+          <div className="form-grupo">
+            <label htmlFor="f-observaciones">Observaciones adicionales (opcional)</label>
+            <textarea
+                id="f-observaciones"
+                name="observaciones"
+                rows="3"
+                value={datos.observaciones}
+                onChange={cambiar}
+            />
+          </div>
+
+          {carrito.items.length === 0 && (
+              <p className="estado estado-error">Tu carrito está vacío.</p>
+          )}
+
+          <div className="carrito-botones">
+            <button
+                type="button"
+                className="btn-secundario"
+                id="entrega-volver"
+                onClick={props.onVolver}
+            >
+              ← Volver al carrito
+            </button>
+            <button
+                type="submit"
+                className="btn-calcular"
+                id="entrega-generar"
+                disabled={carrito.items.length === 0}
+            >
+              Generar pedido
+            </button>
+          </div>
+        </form>
+      </section>
   );
 }

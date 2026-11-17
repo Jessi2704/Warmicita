@@ -5,10 +5,14 @@ import { CarritoProvider } from './CarritoContext.jsx';
 import './index.css';
 import './carrito.css';
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <CarritoProvider>
-      <App />
-    </CarritoProvider>
-  </React.StrictMode>
+const contenedorHtml = document.getElementById('root');
+
+const raiz = ReactDOM.createRoot(contenedorHtml);
+
+raiz.render(
+    <React.StrictMode>
+        <CarritoProvider>
+            <App />
+        </CarritoProvider>
+    </React.StrictMode>
 );

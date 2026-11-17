@@ -34,30 +34,52 @@ const ARTICULOS = [
 export default function AprendeCuerpo() {
   const [abierto, setAbierto] = useState(null);
 
-  return (
-    <section id="aprende" className="seccion-bloque">
-      <h2 className="seccion-titulo">Aprende sobre tu cuerpo</h2>
-      <p className="seccion-intro">
-        Una biblioteca educativa con artículos, infografías y videos. Empezamos con estos artículos;
-        pronto sumaremos más material.
-      </p>
+  function alternarArticulo(idArticulo) {
+    if (abierto === idArticulo) {
+      setAbierto(null);
+    } else {
+      setAbierto(idArticulo);
+    }
+  }
 
-      <div className="grid-articulos">
-        {ARTICULOS.map((a) => {
-          const activo = abierto === a.id;
-          return (
-            <article key={a.id} className={`articulo ${activo ? 'abierto' : ''}`}>
-              <span className="articulo-emoji" aria-hidden="true">{a.emoji}</span>
-              <h3>{a.titulo}</h3>
-              <p>{a.resumen}</p>
-              {activo && <p className="articulo-texto">{a.texto}</p>}
-              <button className="btn-link" id={`articulo-${a.id}`} onClick={() => setAbierto(activo ? null : a.id)}>
-                {activo ? 'Leer menos ↑' : 'Leer más ↓'}
-              </button>
-            </article>
-          );
-        })}
-      </div>
-    </section>
+  return (
+      <section id="aprende" className="seccion-bloque">
+        <h2 className="seccion-titulo">Aprende sobre tu cuerpo</h2>
+        <p className="seccion-intro">
+          Una biblioteca educativa con artículos, infografías y videos. Empezamos con estos artículos;
+          pronto sumaremos más material.
+        </p>
+
+        <div className="grid-articulos">
+          {ARTICULOS.map(function (a) {
+            const activo = abierto === a.id;
+
+            let claseTarjeta = 'articulo';
+            let textoBoton = 'Leer más ↓';
+            if (activo) {
+              claseTarjeta = 'articulo abierto';
+              textoBoton = 'Leer menos ↑';
+            }
+
+            return (
+                <article key={a.id} className={claseTarjeta}>
+                  <span className="articulo-emoji" aria-hidden="true">{a.emoji}</span>
+                  <h3>{a.titulo}</h3>
+                  <p>{a.resumen}</p>
+                  {activo && <p className="articulo-texto">{a.texto}</p>}
+                  <button
+                      className="btn-link"
+                      id={'articulo-' + a.id}
+                      onClick={function () {
+                        alternarArticulo(a.id);
+                      }}
+                  >
+                    {textoBoton}
+                  </button>
+                </article>
+            );
+          })}
+        </div>
+      </section>
   );
 }

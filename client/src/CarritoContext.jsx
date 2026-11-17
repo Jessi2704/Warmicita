@@ -4,63 +4,149 @@ const CLAVE = 'warmicita_carrito';
 const CarritoContext = createContext(null);
 
 // Lee el carrito guardado en LocalStorage (si existe)
-const leerGuardado = () => {
+function leerGuardado() {
   try {
-    return JSON.parse(localStorage.getItem(CLAVE)) || [];
-  } catch {
+    const texto = localStorage.getItem(CLAVE);
+    if (!texto) {
+      return [];
+    }
+    return JSON.parse(texto);
+  } catch (error) {
     return [];
   }
-};
+}
 
-export function CarritoProvider({ children }) {
+function obtenerMaximo(item) {
+  if (item.stock > 0) {
+    return item.stock;
+  }
+  return 99;
+}
+
+export function CarritoProvider(props) {
   const [items, setItems] = useState(leerGuardado);
 
   // Cada vez que cambia el carrito, se guarda en LocalStorage
-  useEffect(() => {
+  useEffect(function () {
     localStorage.setItem(CLAVE, JSON.stringify(items));
   }, [items]);
 
-  const maximo = (item) => (item.stock > 0 ? item.stock : 99);
+  function agregar(producto, cantidad) {
+    let cantidadAgregar = 1;
+    if (cantidad !== undefined) {
+      cantidadAgregar = cantidad;
+    }
 
-  const agregar = (producto, cantidad = 1) => {
-    setItems((actual) => {
-      const existente = actual.find((i) => i._id === producto._id);
-      if (existente) {
-        return actual.map((i) =>
-          i._id === producto._id ? { ...i, cantidad: Math.min(i.cantidad + cantidad, maximo(i)) } : i
-        );
+    const nuevaLista = [];
+    let encontrado = false;
+
+    for (let i = 0; i < items.length; i++) {
+      const itemActual = items[i];
+
+      if (itemActual._id === producto._id) {
+        encontrado = true;
+        const max = obtenerMaximo(itemActual);
+        let nuevaCantidad = itemActual.cantidad + cantidadAgregar;
+        if (nuevaCantidad > max) {
+          nuevaCantidad = max;
+        }
+
+        const copiaItem = Object.assign({}, itemActual);
+        copiaItem.cantidad = nuevaCantidad;
+        nuevaLista.push(copiaItem);
+      } else {
+        nuevaLista.push(itemActual);
       }
+    }
+
+    if (!encontrado) {
+      const maxNuevo = obtenerMaximo(producto);
+      let cantInicial = cantidadAgregar;
+      if (cantInicial > maxNuevo) {
+        cantInicial = maxNuevo;
+      }
+
       const nuevo = {
         _id: producto._id,
         nombre: producto.nombre,
         precio: producto.precio,
         imagen: producto.imagen,
         stock: producto.stock,
-        cantidad: Math.min(cantidad, maximo(producto)),
+        cantidad: cantInicial,
       };
-      return [...actual, nuevo];
-    });
+      nuevaLista.push(nuevo);
+    }
+
+    setItems(nuevaLista);
+  }
+
+  function cambiarCantidad(id, cantidad) {
+    const nuevaLista = [];
+
+    for (let i = 0; i < items.length; i++) {
+      const itemActual = items[i];
+
+      if (itemActual._id === id) {
+        const max = obtenerMaximo(itemActual);
+        let nuevaCantidad = cantidad;
+        if (nuevaCantidad < 1) {
+          nuevaCantidad = 1;
+        }
+        if (nuevaCantidad > max) {
+          nuevaCantidad = max;
+        }
+
+        const copiaItem = Object.assign({}, itemActual);
+        copiaItem.cantidad = nuevaCantidad;
+        nuevaLista.push(copiaItem);
+      } else {
+        nuevaLista.push(itemActual);
+      }
+    }
+
+    setItems(nuevaLista);
+  }
+
+  function eliminar(id) {
+    const nuevaLista = [];
+    for (let i = 0; i < items.length; i++) {
+      if (items[i]._id !== id) {
+        nuevaLista.push(items[i]);
+      }
+    }
+    setItems(nuevaLista);
+  }
+
+  function vaciar() {
+    setItems([]);
+  }
+
+  // Cálculo de totales con bucle for tradicional
+  let totalProductos = 0;
+  let total = 0;
+
+  for (let i = 0; i < items.length; i++) {
+    totalProductos = totalProductos + items[i].cantidad;
+    total = total + (items[i].precio * items[i].cantidad);
+  }
+
+  const valorContexto = {
+    items: items,
+    agregar: agregar,
+    cambiarCantidad: cambiarCantidad,
+    eliminar: eliminar,
+    vaciar: vaciar,
+    totalProductos: totalProductos,
+    total: total,
   };
-
-  const cambiarCantidad = (id, cantidad) => {
-    setItems((actual) =>
-      actual.map((i) => (i._id === id ? { ...i, cantidad: Math.max(1, Math.min(cantidad, maximo(i))) } : i))
-    );
-  };
-
-  const eliminar = (id) => setItems((actual) => actual.filter((i) => i._id !== id));
-  const vaciar = () => setItems([]);
-
-  const totalProductos = items.reduce((suma, i) => suma + i.cantidad, 0);
-  const total = items.reduce((suma, i) => suma + i.precio * i.cantidad, 0);
 
   return (
-    <CarritoContext.Provider
-      value={{ items, agregar, cambiarCantidad, eliminar, vaciar, totalProductos, total }}
-    >
-      {children}
-    </CarritoContext.Provider>
+      <CarritoContext.Provider value={valorContexto}>
+        {props.children}
+      </CarritoContext.Provider>
   );
 }
 
-export const useCarrito = () => useContext(CarritoContext);
+export function useCarrito() {
+  return useContext(CarritoContext);
+}
