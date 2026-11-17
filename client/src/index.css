@@ -151,11 +151,17 @@ main { max-width: 1120px; margin: 2.5rem auto; padding: 0 1.2rem; }
 .resultados-contenedor { display: none; flex-direction: column; gap: 1rem; }
 .resultados-contenedor.visible { display: flex; animation: aparecer 0.4s ease; }
 .card-resultado { background: var(--blanco); border-left: 5px solid var(--violeta-600); padding: 1rem 1.2rem; border-radius: 16px; box-shadow: var(--sombra-suave); border-top: 1px solid var(--lila-100); border-right: 1px solid var(--lila-100); border-bottom: 1px solid var(--lila-100); }
+.card-resultado.menstrual-actual { border-left-color: #e11d74; }
+.card-resultado.proxima { border-left-color: var(--violeta-600); }
 .card-resultado.ovulacion { border-left-color: var(--rosa); }
 .card-resultado.fertil { border-left-color: var(--lila-400); }
 .card-resultado h4 { color: var(--violeta-700); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 0.2rem; }
 .card-resultado p { font-size: 1.2rem; font-weight: 700; color: var(--violeta-900); }
 .card-resultado span.nota { display: block; font-size: 0.82rem; font-weight: 400; color: var(--texto-suave); margin-top: 0.2rem; }
+.form-hint { display: block; color: var(--texto-suave); font-size: 0.78rem; margin-top: 0.3rem; }
+.calc-error { background: #fdf2f8; color: #be185d; border: 1px solid #fbcfe8; border-radius: 12px; padding: 0.65rem 1rem; font-size: 0.88rem; margin-bottom: 0.8rem; }
+.btn-conoce-ciclo { width: 100%; margin-top: 0.4rem; background: linear-gradient(135deg, var(--violeta-900), var(--violeta-700)); color: var(--lila-200); border: none; padding: 0.85rem 1.2rem; border-radius: 999px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.25s; box-shadow: 0 10px 22px -10px rgba(74, 15, 143, 0.6); }
+.btn-conoce-ciclo:hover { transform: translateY(-2px); box-shadow: 0 14px 26px -10px rgba(74, 15, 143, 0.8); color: var(--blanco); }
 
 /* ---------- Pie ---------- */
 footer { background: linear-gradient(135deg, var(--violeta-900), var(--violeta-800)); color: var(--lila-200); text-align: center; padding: 2rem 1.5rem; margin-top: 4rem; border-radius: 36px 36px 0 0; }
@@ -208,10 +214,13 @@ nav { max-width: calc(100% - 1rem); }
 .segmento.activo { background: var(--c); border-color: var(--c); color: var(--blanco); box-shadow: 0 12px 22px -10px var(--c); }
 .segmento.activo small { color: rgba(255, 255, 255, 0.85); }
 .detalle-fase { background: var(--blanco); border: 1px solid var(--lila-200); border-left: 6px solid var(--c); border-radius: var(--radio); padding: 1.6rem; box-shadow: var(--sombra-suave); animation: aparecer 0.35s ease; }
-.detalle-fase h3 { color: var(--c); font-size: 1.4rem; margin-bottom: 0.6rem; }
-.detalle-fase h3 span { color: var(--texto-suave); font-size: 0.95rem; font-weight: 500; }
+.detalle-fase-header { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 0.6rem; }
+.detalle-fase-header h3 { color: var(--c); font-size: 1.4rem; margin: 0; }
+.detalle-fase-header h3 span { color: var(--texto-suave); font-size: 0.95rem; font-weight: 500; }
+.detalle-fechas { background: var(--lila-100); color: var(--violeta-700); border: 1px solid var(--lila-200); border-radius: 999px; padding: 0.2rem 0.9rem; font-size: 0.82rem; font-weight: 600; white-space: nowrap; }
 .detalle-fase p { margin-bottom: 0.4rem; }
 .detalle-fase .tip { background: var(--lila-100); border-radius: 14px; padding: 0.7rem 1rem; color: var(--violeta-800); margin-top: 0.8rem; }
+.nota-disclaimer { max-width: 760px; margin: 1.2rem auto 0; text-align: center; font-size: 0.82rem; color: var(--texto-suave); background: var(--lila-100); border: 1px dashed var(--lila-300); border-radius: 14px; padding: 0.75rem 1.2rem; line-height: 1.5; }
 
 /* Métodos */
 .grid-metodos { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.4rem; }
@@ -229,11 +238,69 @@ nav { max-width: calc(100% - 1rem); }
 .caja-ayuda .aviso { color: var(--lila-200); text-align: left; }
 
 /* Cómo pedir */
-.pasos { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem; }
-.paso { display: flex; gap: 1rem; background: var(--blanco); border: 1px solid var(--lila-200); border-radius: var(--radio); padding: 1.3rem; box-shadow: var(--sombra-suave); }
-.paso-num { flex-shrink: 0; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: var(--blanco); background: linear-gradient(135deg, var(--violeta-700), var(--lila-400)); }
-.paso h3 { color: var(--violeta-900); font-size: 1rem; margin-bottom: 0.2rem; }
-.paso p { color: var(--texto-suave); font-size: 0.88rem; }
+.pasos {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  position: relative;
+}
+/* línea conectora entre pasos */
+.pasos::before {
+  content: '';
+  position: absolute;
+  top: 21px; /* centro del círculo numerado */
+  left: calc(100% / 10); /* desde el centro del primer paso */
+  right: calc(100% / 10); /* hasta el centro del último paso */
+  height: 2px;
+  background: linear-gradient(90deg, var(--violeta-700), var(--lila-400));
+  z-index: 0;
+}
+.paso {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.7rem;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+.paso-num {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: var(--blanco);
+  background: linear-gradient(135deg, var(--violeta-700), var(--lila-400));
+  box-shadow: 0 6px 16px -6px rgba(95, 23, 173, 0.6);
+  border: 3px solid var(--crema); /* separa del fondo para que destaque sobre la línea */
+}
+.paso-card {
+  background: var(--blanco);
+  border: 1px solid var(--lila-200);
+  border-radius: var(--radio);
+  padding: 1rem 0.8rem;
+  box-shadow: var(--sombra-suave);
+  flex-grow: 1;
+  width: 100%;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.paso-card:hover { transform: translateY(-4px); box-shadow: var(--sombra-fuerte); }
+.paso h3 { color: var(--violeta-900); font-size: 0.88rem; margin-bottom: 0.3rem; line-height: 1.3; }
+.paso p { color: var(--texto-suave); font-size: 0.78rem; line-height: 1.4; }
+@media (max-width: 700px) {
+  .pasos { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .pasos::before { display: none; }
+  .paso { flex-direction: row; text-align: left; align-items: flex-start; }
+  .paso-card { text-align: left; }
+}
 .faq { max-width: 720px; margin: 1.8rem auto 0; display: grid; gap: 0.7rem; }
 .faq-item { background: var(--blanco); border: 1px solid var(--lila-200); border-radius: 16px; overflow: hidden; }
 .faq-item button { width: 100%; display: flex; justify-content: space-between; background: none; border: none; padding: 1rem 1.2rem; font-weight: 600; color: var(--violeta-800); cursor: pointer; font-size: 0.95rem; text-align: left; }
