@@ -73,6 +73,11 @@ button.menu-card { font: inherit; cursor: pointer; width: 100%; }
 .menu-icono { position: relative; display: inline-flex; }
 .menu-icono .badge { position: absolute; top: -8px; right: -14px; margin: 0; color: var(--blanco); }
 
+/* Carrito flotante (fijo en la esquina, visible al hacer scroll) */
+.carrito-flotante { position: fixed; right: 1.2rem; bottom: 1.2rem; z-index: 90; width: 62px; height: 62px; border-radius: 50%; border: none; font-size: 1.6rem; cursor: pointer; color: var(--blanco); background: linear-gradient(135deg, var(--violeta-700), var(--violeta-500)); box-shadow: 0 14px 28px -8px rgba(74, 15, 143, 0.7); transition: transform 0.25s; animation: aparecer 0.35s ease; }
+.carrito-flotante:hover { transform: scale(1.1); }
+.carrito-flotante .badge { position: absolute; top: -4px; right: -4px; margin: 0; }
+
 /* Lema del encabezado en dos líneas */
 header p.lema { max-width: none; font-size: 1.05rem; line-height: 1.5; }
 @media (max-width: 640px) { header p.lema { font-size: 0.95rem; } }
