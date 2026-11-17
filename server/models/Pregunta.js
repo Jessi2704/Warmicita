@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-// Preguntas anónimas: NO se guarda ningún dato personal (ni IP, ni nombre, ni correo)
+// Preguntas anónimas
 const preguntaSchema = new mongoose.Schema(
   {
     texto: { type: String, required: true, trim: true, minlength: 10, maxlength: 600 },

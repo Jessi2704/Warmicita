@@ -2,7 +2,6 @@ import 'dotenv/config';
 import mongoose from 'mongoose';
 import Producto from './models/Producto.js';
 
-// Los precios y el stock son valores iniciales de ejemplo: edítalos a los reales.
 const productos = [
   // ---------- Menstruación ----------
   {
@@ -52,34 +51,16 @@ const productos = [
 
   // ---------- Alivio y bienestar ----------
   {
-    nombre: 'Parches Térmicos para Cólicos',
-    resumen: 'Parches adhesivos de calor terapéutico para aliviar molestias menstruales hasta 8h.',
-    descripcion: 'Calor natural autorregulable que relaja los músculos uterinos y disminuye el dolor menstrual. Fácil de usar y discreto debajo de la ropa.',
-    precio: 10, categoria: 'alivio', imagen: '/parche_termico.jpg', stock: 0,
-  },
-  {
     nombre: 'Bolsa Térmica',
     resumen: 'Bolsa de agua caliente con funda tejida para aliviar cólicos y tensión.',
     descripcion: 'Bolsa térmica de agua caliente con funda tejida suave. Aplica calor sobre el abdomen o la espalda baja para ayudar a relajar los músculos. Usa agua caliente, no hirviendo, y no la apliques directamente sobre la piel por tiempos prolongados.',
     precio: 14, categoria: 'alivio', imagen: '/bolsa_termica.jpg', stock: 22,
   },
   {
-    nombre: 'Almohadilla de Calor',
-    resumen: 'Almohadilla eléctrica con control de temperatura para tus días difíciles.',
-    descripcion: 'Almohadilla de calor con tela afelpada y control de encendido. Brinda calor constante y reconfortante en abdomen, espalda o cuello. Sigue las indicaciones del fabricante y no te duermas con ella encendida.',
-    precio: 25, categoria: 'alivio', imagen: '/almohadilla_calor.jpg', stock: 15,
-  },
-  {
     nombre: 'Compresas Reutilizables',
     resumen: 'Compresas de gel para calor o frío, con funda de tela suave.',
     descripcion: 'Compresas reutilizables que se pueden usar calientes (microondas) o frías (congelador) según lo que necesites. Con funda de tela suave y lavable. Sigue el tiempo de calentamiento indicado para evitar quemaduras.',
     precio: 12, categoria: 'alivio', imagen: '/compresas_reutilizables.jpg', stock: 28,
-  },
-  {
-    nombre: 'Masajeador Corporal',
-    resumen: 'Masajeador portátil recargable para relajar espalda, cuello y zona lumbar.',
-    descripcion: 'Masajeador corporal portátil con varias intensidades. Ayuda a relajar la tensión muscular de espalda, cuello y zona lumbar durante la menstruación o después de un día largo.',
-    precio: 30, categoria: 'alivio', imagen: '/masajeador_corporal.jpg', stock: 12,
   },
   {
     nombre: 'Botella de Agua Reutilizable',
