@@ -16,7 +16,10 @@ export default function ComoPedir() {
         {PASOS.map((p) => (
           <li key={p.n} className="paso">
             <span className="paso-num">{p.n}</span>
-            <div><h3>{p.t}</h3><p>{p.d}</p></div>
+            <div className="paso-card">
+              <h3>{p.t}</h3>
+              <p>{p.d}</p>
+            </div>
           </li>
         ))}
       </ol>
