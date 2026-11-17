@@ -9,43 +9,55 @@ import ComoPedir from './components/ComoPedir.jsx';
 import Carrito from './components/Carrito.jsx';
 import Entrega from './components/Entrega.jsx';
 import PedidoListo from './components/PedidoListo.jsx';
+import PaginaInicio from './components/PaginaInicio.jsx';
 import { useCarrito } from './CarritoContext.jsx';
 import { nuevoCodigo } from './pedido.js';
-import MenuTarjetas from './components/MenuTarjetas.jsx';
 
+const TABS = [
+  { id: 'tienda', label: 'Tienda',   emoji: '🛍️', sub: 'Catálogo y pedidos' },
+  { id: 'ciclo',  label: 'Mi Ciclo', emoji: '🌸', sub: 'Calculadora y fases' },
+  { id: 'aprende',label: 'Aprende',  emoji: '📚', sub: 'Cuerpo y métodos'    },
+];
 
 export default function App() {
-  // vista: 'tienda' | 'carrito' | 'entrega' | 'listo'
-  const [vista, setVista] = useState('tienda');
-  const [pedido, setPedido] = useState(null);
+  // pantalla: 'home' | 'contenido' | 'carrito' | 'entrega' | 'listo'
+  const [pantalla, setPantalla] = useState('home');
+  const [tab, setTab]           = useState('tienda');
+  const [pedido, setPedido]     = useState(null);
   const [cicloData, setCicloData] = useState(null);
   const { items, total, totalProductos, vaciar } = useCarrito();
 
-  // Cambia de pantalla y sube al inicio (o baja a una sección de la tienda)
-  const ir = (nueva, hash) => {
-    setVista(nueva);
-    setTimeout(() => {
-      if (hash) document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth' });
-      else window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 50);
+  /* Navegar a sección desde la página de inicio */
+  const entrarSeccion = (seccionId) => {
+    setTab(seccionId);
+    setPantalla('contenido');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const clickMenu = (e, hash) => {
-    e.preventDefault();
-    ir('tienda', hash);
+  const cambiarTab = (id) => {
+    setTab(id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Crea el pedido con código y fecha, y vacía el carrito
+  const irHome = () => {
+    setPantalla('home');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const confirmarPedido = (cliente) => {
     setPedido({ codigo: nuevoCodigo(), fecha: new Date().toISOString(), cliente, items, total });
     vaciar();
-    ir('listo');
+    setPantalla('listo');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <>
+      {/* ── Encabezado ── */}
       <header>
-        <img className="logo" src="/logo_oficial.png" alt="Logo Warmicita" />
+        <button className="logo-btn" onClick={irHome} aria-label="Ir al inicio">
+          <img className="logo" src="/logo_oficial.png" alt="Logo Warmicita" />
+        </button>
         <div>
           <h1>Warmicita</h1>
           <p className="lema">
@@ -55,53 +67,103 @@ export default function App() {
         </div>
       </header>
 
-      {vista === 'tienda' && (
-        <MenuTarjetas onIr={clickMenu} onCarrito={() => ir('carrito')} totalProductos={totalProductos} />
+      {/* ── Barra de pestañas (solo cuando estamos en contenido) ── */}
+      {pantalla === 'contenido' && (
+        <nav className="tabs-nav" aria-label="Secciones principales">
+          <button className="tab-inicio-btn" onClick={irHome} title="Inicio">
+            <span className="tab-emoji">🏠</span>
+            <span className="tab-label">Inicio</span>
+            <span className="tab-sub">Página principal</span>
+          </button>
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              className={`tab-btn ${tab === t.id ? 'activa' : ''}`}
+              onClick={() => cambiarTab(t.id)}
+              aria-current={tab === t.id ? 'page' : undefined}
+            >
+              <span className="tab-emoji">{t.emoji}</span>
+              <span className="tab-label">{t.label}</span>
+              <span className="tab-sub">{t.sub}</span>
+            </button>
+          ))}
+        </nav>
       )}
 
+      {/* ── Contenido principal ── */}
       <main id="inicio">
-        {vista === 'tienda' && (
+
+        {/* Página de inicio */}
+        {pantalla === 'home' && (
+          <PaginaInicio onEntrar={entrarSeccion} />
+        )}
+
+        {/* Secciones con tabs */}
+        {pantalla === 'contenido' && (
           <>
-            <section className="banner">
-              <div className="banner-texto">
-                <h2>Todo lo que necesitas para sentirte bien</h2>
-                <p>Productos seleccionados para cuidar de ti con comodidad y confianza.</p>
-              </div>
-            </section>
+            {tab === 'tienda' && (
+              <>
+                <section className="banner">
+                  <div className="banner-texto">
+                    <h2>Todo lo que necesitas para sentirte bien</h2>
+                    <p>Productos seleccionados para cuidar de ti con comodidad y confianza.</p>
+                  </div>
+                </section>
+                <Catalogo />
+                <ComoPedir />
+                <section id="beneficios" className="info-seccion">
+                  <h2>Por qué elegir opciones sostenibles para tu salud:</h2>
+                  <ul>
+                    <li><strong>Cuidado corporal:</strong> Productos libres de blanqueadores clorados y químicos agresivos.</li>
+                    <li><strong>Ahorro económico:</strong> La copa menstrual y las toallas lavables duran años.</li>
+                    <li><strong>Sostenibilidad:</strong> Reducción directa de desechos plásticos en el medio ambiente.</li>
+                  </ul>
+                </section>
+              </>
+            )}
 
-            <Catalogo />
-            <ComoPedir />
-            <Calculadora onCalculo={setCicloData} />
-            <ConoceCiclo cicloData={cicloData} />
-            <PreguntaSinVerguenza />
-            <AprendeCuerpo />
-            <MetodosAnticonceptivos />
+            {tab === 'ciclo' && (
+              <>
+                <Calculadora onCalculo={setCicloData} />
+                <ConoceCiclo cicloData={cicloData} />
+              </>
+            )}
 
-            <section id="beneficios" className="info-seccion">
-              <h2>Por qué elegir opciones sostenibles para tu salud:</h2>
-              <ul>
-                <li><strong>Cuidado corporal:</strong> Productos libres de blanqueadores clorados y químicos agresivos.</li>
-                <li><strong>Ahorro económico:</strong> La copa menstrual y las toallas lavables duran años.</li>
-                <li><strong>Sostenibilidad:</strong> Reducción directa de desechos plásticos en el medio ambiente.</li>
-              </ul>
-            </section>
+            {tab === 'aprende' && (
+              <>
+                <PreguntaSinVerguenza />
+                <AprendeCuerpo />
+                <MetodosAnticonceptivos />
+              </>
+            )}
           </>
         )}
 
-        {vista === 'carrito' && (
-          <Carrito onSeguir={() => ir('tienda', '#catalogo')} onContinuar={() => ir('entrega')} />
+        {/* Flujo de compra */}
+        {pantalla === 'carrito' && (
+          <Carrito
+            onSeguir={() => { setPantalla('contenido'); setTab('tienda'); }}
+            onContinuar={() => setPantalla('entrega')}
+          />
         )}
-        {vista === 'entrega' && (
-          <Entrega onVolver={() => ir('carrito')} onConfirmar={confirmarPedido} />
+        {pantalla === 'entrega' && (
+          <Entrega onVolver={() => setPantalla('carrito')} onConfirmar={confirmarPedido} />
         )}
-        {vista === 'listo' && pedido && (
-          <PedidoListo pedido={pedido} onTienda={() => ir('tienda', '#catalogo')} />
+        {pantalla === 'listo' && pedido && (
+          <PedidoListo
+            pedido={pedido}
+            onTienda={() => { setPantalla('contenido'); setTab('tienda'); }}
+          />
         )}
       </main>
 
-      {/* Carrito flotante: se ve por toda la página mientras haya productos */}
-      {vista === 'tienda' && totalProductos > 0 && (
-        <button className="carrito-flotante" id="carrito-flotante" onClick={() => ir('carrito')} aria-label={`Abrir carrito, ${totalProductos} productos`}>
+      {/* ── Carrito flotante ── */}
+      {(pantalla === 'home' || pantalla === 'contenido') && totalProductos > 0 && (
+        <button
+          className="carrito-flotante" id="carrito-flotante"
+          onClick={() => setPantalla('carrito')}
+          aria-label={`Abrir carrito, ${totalProductos} productos`}
+        >
           🛒
           <span className="badge">{totalProductos}</span>
         </button>

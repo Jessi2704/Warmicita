@@ -61,21 +61,196 @@ header .logo {
 header h1 { font-family: var(--fuente-titulo); font-weight: 400; font-size: clamp(2.6rem, 6vw, 4rem); line-height: 1.1; text-shadow: 0 4px 18px rgba(20, 0, 50, 0.4); }
 header p { font-size: 1.05rem; color: var(--lila-200); max-width: 420px; margin-top: 0.4rem; }
 
-/* ---------- Navegación flotante ---------- */
-nav {
-  position: sticky; top: 12px; z-index: 50;
-  width: fit-content; max-width: calc(100% - 1.5rem);
-  margin: -1.6rem auto 0;
-  display: flex; justify-content: center; gap: 0.3rem; flex-wrap: wrap;
-  padding: 0.45rem;
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-  border: 1px solid var(--lila-200);
-  border-radius: 999px;
-  box-shadow: var(--sombra-suave);
+/* ---------- Navegación de pestañas ---------- */
+.tabs-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 2px solid var(--lila-200);
+  box-shadow: 0 4px 20px -8px rgba(95, 23, 173, 0.18);
 }
-nav a { color: var(--violeta-800); text-decoration: none; font-weight: 600; font-size: 0.92rem; padding: 0.5rem 1.1rem; border-radius: 999px; transition: all 0.25s; }
-nav a:hover { background: linear-gradient(135deg, var(--violeta-600), var(--violeta-500)); color: var(--blanco); transform: translateY(-1px); }
+.tab-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  padding: 0.9rem 0.5rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.25s;
+  border-bottom: 3px solid transparent;
+  color: var(--texto-suave);
+  position: relative;
+}
+.tab-btn:hover {
+  background: var(--lila-100);
+  color: var(--violeta-700);
+}
+.tab-btn.activa {
+  color: var(--violeta-700);
+  border-bottom-color: var(--violeta-600);
+  background: linear-gradient(180deg, transparent, rgba(230, 207, 253, 0.3));
+}
+.tab-btn.activa .tab-emoji {
+  transform: scale(1.2);
+}
+.tab-emoji {
+  font-size: 1.5rem;
+  display: block;
+  transition: transform 0.25s;
+  line-height: 1;
+}
+.tab-label {
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+.tab-sub {
+  font-size: 0.72rem;
+  color: var(--texto-suave);
+  font-weight: 400;
+}
+.tab-btn.activa .tab-sub {
+  color: var(--violeta-600);
+}
+@media (max-width: 480px) {
+  .tab-sub { display: none; }
+  .tab-btn { padding: 0.75rem 0.3rem; }
+  .tab-label { font-size: 0.82rem; }
+}
+
+/* ---------- Logo como botón de inicio ---------- */
+.logo-btn { background: none; border: none; cursor: pointer; padding: 0; display: flex; }
+
+/* ---------- Página de Inicio ---------- */
+.inicio-page { padding: 2.5rem 1.2rem 3rem; max-width: 1120px; margin: 0 auto; }
+.inicio-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.8rem;
+}
+.inicio-card {
+  position: relative;
+  border: none;
+  border-radius: 28px;
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--blanco);
+  box-shadow: var(--sombra-fuerte);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.35s, box-shadow 0.35s;
+  text-align: left;
+  min-height: 520px;
+}
+.inicio-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 30px 60px -15px rgba(74, 15, 143, 0.45);
+}
+.inicio-card-img {
+  width: 100%;
+  height: 420px;
+  background: linear-gradient(135deg, var(--lila-100), var(--lila-200));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+.inicio-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  transition: transform 0.5s ease;
+  padding: 1rem;
+}
+.inicio-card:hover .inicio-card-img img {
+  transform: scale(1.07);
+}
+.inicio-card-body {
+  padding: 1.5rem 1.6rem 1.8rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  background: linear-gradient(180deg, var(--blanco), var(--lila-100));
+  border-top: 3px solid var(--c);
+}
+.inicio-emoji {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.inicio-card h2 {
+  font-family: var(--fuente-titulo);
+  font-weight: 400;
+  color: var(--c);
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  margin-bottom: 0.6rem;
+  line-height: 1.1;
+}
+.inicio-card p {
+  color: var(--texto-suave);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  flex-grow: 1;
+  margin-bottom: 1.2rem;
+}
+.inicio-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--c), var(--violeta-500));
+  color: var(--blanco);
+  font-weight: 700;
+  font-size: 0.92rem;
+  padding: 0.65rem 1.4rem;
+  border-radius: 999px;
+  transition: all 0.25s;
+  box-shadow: 0 8px 20px -8px rgba(74, 15, 143, 0.5);
+  align-self: flex-start;
+}
+.inicio-card:hover .inicio-btn {
+  box-shadow: 0 12px 24px -8px rgba(74, 15, 143, 0.7);
+  transform: translateX(4px);
+}
+@media (max-width: 860px) {
+  .inicio-grid { grid-template-columns: 1fr; gap: 1.4rem; }
+  .inicio-card { min-height: auto; flex-direction: row; border-radius: 22px; }
+  .inicio-card-img { width: 160px; min-width: 160px; height: auto; min-height: 200px; border-radius: 0; }
+  .inicio-card-body { border-top: none; border-left: 3px solid var(--c); }
+}
+@media (max-width: 500px) {
+  .inicio-card { flex-direction: column; }
+  .inicio-card-img { width: 100%; height: 220px; min-height: 220px; }
+}
+
+/* ---------- Botón de inicio en tabs ---------- */
+.tab-inicio-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  padding: 0.9rem 0.5rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.25s;
+  border-bottom: 3px solid transparent;
+  color: var(--texto-suave);
+  font-size: inherit;
+}
+.tab-inicio-btn .tab-emoji { font-size: 1.5rem; display: block; line-height: 1; }
+.tab-inicio-btn .tab-label { font-weight: 700; font-size: 0.95rem; line-height: 1.2; }
+.tab-inicio-btn .tab-sub   { font-size: 0.72rem; color: var(--texto-suave); font-weight: 400; }
+.tab-inicio-btn:hover { background: var(--lila-100); color: var(--violeta-700); }
 
 main { max-width: 1120px; margin: 2.5rem auto; padding: 0 1.2rem; }
 
