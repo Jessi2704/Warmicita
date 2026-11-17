@@ -130,3 +130,4 @@ export function mensajeWhatsApp(pedido) {
 export function enlaceWhatsApp(pedido) {
   const mensajeCodificado = encodeURIComponent(mensajeWhatsApp(pedido));
   return 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + mensajeCodificado;
+}
