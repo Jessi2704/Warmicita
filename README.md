@@ -131,14 +131,6 @@ Warmicita promueve 3 pilares fundamentales:
 
 ---
 
-## 🔮 Futuras Mejoras
-
-* 💾 Guardar el carrito en `localStorage` para no perderlo al recargar.
-* 📖 Más artículos sobre Educación Sexual Integral y salud ginecológica.
-* 🔐 Panel de administración para gestionar productos.
-
----
-
 <p center>
   Desarrollado con 💜 para el cuidado y la educación femenina.
 </p>
