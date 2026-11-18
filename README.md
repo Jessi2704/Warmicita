@@ -26,20 +26,20 @@ El sitio integra un **catálogo interactivo** de productos reutilizables y ecol�
 
 ## ⚡ Características Principales
 
-* 🏷️ **Catálogo Interactivo de Productos:** Navegación dinámica con filtros por categoría:
-  * *Menstruación* (Copas menstruales, toallas ecológicas, calzones menstruales).
-  * *Higiene Íntima* (Jabones neutros y productos de cuidado pH).
-  * *Alivio y Bienestar* (Parches térmicos para cólicos).
-* 🌸 **Calculadora de Ciclo Menstrual:** Herramienta interactiva en JavaScript para estimar la fecha del próximo periodo, el día aproximado de ovulación y la ventana fértil.
-* 🔍 **Vista Previa y Modal de Detalles:** Ventana emergente interactiva para consultar fotografías en alta resolución, descripciones detalladas, precios y disponibilidad.
-* 📚 **Sección de Educación y Salud:** Guía sobre salud menstrual, ingredientes seguros y reducción del impacto ambiental.
-* 📱 **Diseño Responsive & Estético:** Paleta de colores en tonos lavanda y morado, totalmente optimizada para dispositivos móviles, tablets y computadoras.
+La web tiene una **página de inicio** con encabezado, 3 secciones grandes con imagen y pie de página. Cada sección se abre con un menú superior (Inicio · Tienda · Ciclo · Aprende):
+
+* 🛒 **Tienda:** catálogo con filtros por categoría, modal de detalles, beneficios, "Cómo pedir" y carrito con pedido por WhatsApp.
+* 🌸 **Ciclo:** calculadora del ciclo menstrual (próximo periodo, ovulación, ventana fértil) y "Conoce tu ciclo" con sus 4 fases.
+* 📚 **Aprende:** "Pregunta sin vergüenza" (consulta anónima), "Aprende sobre tu cuerpo" y "Conoce tus métodos anticonceptivos".
+* 📱 **Diseño responsive** en tonos lavanda y morado.
 
 ---
 
 ## 🛠️ Tecnologías Utilizadas
 
-* **React 18 + Vite:** Interfaz en componentes (`Catalogo`, `TarjetaProducto`, `ModalProducto`, `Calculadora`) en la carpeta `client/`.
+> **Lenguaje:** todo el proyecto está en **JavaScript** (frontend con JSX/React y backend con Node.js), más HTML y CSS.
+
+* **React 18 + Vite:** Interfaz en componentes dentro de `client/`.
 * **Node.js + Express:** API REST en `server/` (`GET/POST /api/productos`).
 * **MongoDB Atlas + Mongoose:** Base de datos en la nube donde viven los productos del catálogo.
 * **CSS3:** Estilos nativos (Vanilla CSS) utilizando *Flexbox* y *CSS Grid*, animaciones suaves y componentes flotantes (Modales).
@@ -55,15 +55,22 @@ warmicita/
 │   ├── index.html
 │   ├── vite.config.js      # Proxy /api -> localhost:3000
 │   └── src/
-│       ├── App.jsx
-│       ├── index.css
-│       └── components/     # Catalogo, TarjetaProducto, ModalProducto, Calculadora
+│       ├── main.jsx        # Punto de entrada de React
+│       ├── App.jsx         # Navegación entre Inicio / Tienda / Ciclo / Aprende
+│       ├── CarritoContext.jsx  # Estado global del carrito
+│       ├── config.js / pedido.js  # Número de WhatsApp y mensaje del pedido
+│       ├── index.css / carrito.css
+│       └── components/     # PaginaInicio, Catalogo, TarjetaProducto, ModalProducto,
+│                           # ComoPedir, Carrito, Entrega, PedidoListo, Calculadora,
+│                           # ConoceCiclo, PreguntaSinVerguenza, AprendeCuerpo,
+│                           # MetodosAnticonceptivos
 ├── server/                 # API Express + MongoDB Atlas
 │   ├── index.js
 │   ├── seed.js             # Carga los productos iniciales
 │   ├── models/Producto.js
 │   └── .env.example
 ├── index.html              # Versión original estática (referencia)
+├── package.json            # Scripts generales (install:all, dev, build, seed)
 └── README.md
 ```
 
@@ -71,22 +78,46 @@ warmicita/
 
 ## 🚀 Instrucciones de Uso / Instalación
 
-1. **MongoDB Atlas:** crea un cluster gratuito en https://cloud.mongodb.com, un usuario de base de datos y permite tu IP en *Network Access*.
-2. **Configurar el servidor:**
-   ```bash
-   cd server
-   cp .env.example .env      # pega tu cadena de conexión en MONGODB_URI
-   npm install
-   npm run seed              # inserta los 5 productos en Atlas
-   npm run dev               # API en http://localhost:3000
-   ```
-3. **Levantar el frontend (otra terminal):**
-   ```bash
-   cd client
-   npm install
-   npm run dev               # http://localhost:5173
-   ```
-4. **Producción:** `cd client && npm run build`, luego `cd server && npm start` sirve todo en http://localhost:3000.
+### Requisitos
+* [Node.js](https://nodejs.org) 18 o superior (incluye `npm`).
+* Una cuenta gratuita de [MongoDB Atlas](https://cloud.mongodb.com) (solo si quieres usar la base de datos).
+
+### 1. Clonar e instalar dependencias
+```bash
+git clone https://github.com/Jessi2704/Warmicita.git
+cd Warmicita
+npm run install:all        # instala server/ y client/
+```
+
+### 2. Configurar la base de datos (servidor)
+```bash
+cd server
+cp .env.example .env       # pega tu cadena de conexión en MONGODB_URI
+npm run seed               # carga los productos iniciales en Atlas
+```
+> En Atlas recuerda permitir tu IP en *Network Access*.
+
+### 3. Levantar el proyecto en desarrollo (2 terminales)
+
+**Terminal 1 – API:**
+```bash
+cd server
+npm run dev                # http://localhost:3000
+```
+
+**Terminal 2 – Frontend:**
+```bash
+cd client
+npm run dev                # http://localhost:5173
+```
+
+Abre **http://localhost:5173** en el navegador. 🎉
+
+### 4. Producción
+```bash
+npm run build              # compila el frontend (client/dist)
+npm start                  # el servidor sirve todo en http://localhost:3000
+```
 
 ---
 
@@ -102,9 +133,9 @@ Warmicita promueve 3 pilares fundamentales:
 
 ## 🔮 Futuras Mejoras
 
-* 🛒 Integración de un carrito de compras interactivo con almacenamiento local (`localStorage`).
-* 💬 Botón de contacto directo a WhatsApp para atención y consultas personalizadas.
-* 📖 Sección de Blog / Artículos sobre Educación Sexual Integral, ciclo menstrual y salud ginecológica.
+* 💾 Guardar el carrito en `localStorage` para no perderlo al recargar.
+* 📖 Más artículos sobre Educación Sexual Integral y salud ginecológica.
+* 🔐 Panel de administración para gestionar productos.
 
 ---
 
